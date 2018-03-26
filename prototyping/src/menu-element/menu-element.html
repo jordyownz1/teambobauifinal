@@ -1,0 +1,102 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components\iron-ajax\iron-ajax.html">
+<link rel="import" href="../../bower_components\geo-location\geo-location.html">
+<link rel="import" href="../../bower_components\paper-button\paper-button.html">
+
+
+<dom-module id="menu-element">
+  <template>
+    <style>
+      :host {
+        background-color: red;
+      }
+      paper-button{
+        color: white;
+        border-style: solid;
+        border-color: red;
+        text-align: center;
+        width: 25px;
+        height: 100%;
+        font-size: 12px;
+      }
+      .menu p{
+        color: white;
+      }
+
+      .menu ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          border:solid;
+          background-color: #333;
+      }
+
+      .menu li {
+          float: top;
+      }
+
+      .menu li a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+      }
+
+      .menu li a:hover {
+          background-color: #111;
+      }
+
+      .menu a.active{
+        background-color: #111;
+      }
+
+      h1{
+        font-size:80px;
+        text-align: center;
+        color: white;
+      }
+
+    </style>
+    <app-localstorage-document key="voornaam" data={{voornaam}}></app-localstorage-document>
+
+    <!-- params='{"lat":"[[latitude]]", "lon":"[[longitude]]", "appid":"684d4cb2840ec7fa4340e79722d083f8"}' -->
+
+    <h1>Sushi home</h1>
+    <div class="menu">
+    <ul>
+      <li><a href="ingredient_toevoegen.html">Ingrediënt toevoegen</a></li>
+      <li><a href="ingredient_verwijderen.html">Ingrediënt verwijderen </a></li>
+      <li><a href="op_menukaart_zetten.html">Op menukaart zetten</a></li>
+      <li><a href="gerecht_toevoegen.html">Gerecht toevoegen</a></li>
+      <li><a href="gerecht_verwijderen.html">Gerecht verwijderen</a></li>
+
+    </ul>
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class MenuElement extends Polymer.Element {
+      static get is() { return 'menu-element'; }
+      static get properties() {
+        return {
+          voornaam: String
+  };
+}
+
+
+eenFuntie(){
+  console.log("Uitgevoerd!");
+}
+
+  }
+
+    window.customElements.define(MenuElement.is, MenuElement);
+  </script>
+</dom-module>

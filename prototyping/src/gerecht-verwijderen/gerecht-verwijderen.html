@@ -1,0 +1,207 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="/src/gerecht-verwijderen/gerecht-verwijderen.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components\paper-listbox\paper-listbox.html">
+<link rel="import" href="../../bower_components\paper-button\paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components\app-storage\app-localstorage\app-localstorage-document.html">
+
+
+<dom-module id="gerecht-verwijderen">
+  <template>
+    <style>
+    .modal-content paper-button{
+        width: 25px;
+        height: 25px;
+        float: right;
+      }
+
+      paper-dropdown-menu{
+        margin-left: 10%;
+        width: 80%;
+      }
+
+      h1{
+        margin-top:2%;
+        margin-left:5%;
+      }
+
+      h3 {
+        margin-top: 5%;
+
+        margin-left: 10%;
+      }
+
+      #buttons{
+        margin-left: 79%;
+        margin-top: 10%;
+      }
+
+      paper-button{
+        border-style: solid;
+
+      }
+
+      #myModal {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      /* Modal Content/Box */
+      .modal-content{
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          /* padding: 20px; */
+          border: 1px solid #888;
+          width: 25%; /* Could be more or less, depending on screen size */
+          height: 15%;
+      }
+      .modal-content p{
+        margin-left: 20px;
+      }
+
+    </style>
+    <app-localstorage-document id="opslag" key="gerechten" data={{gerechten}}></app-localstorage-document>
+
+
+    <h1>Gerecht verwijderen</h1>
+    <hr color="black" size="3">
+
+    <h3> Gerechten die niet op het menu staan:</h3>
+    <paper-dropdown-menu id="dropdownBox">
+      <paper-listbox slot="dropdown-content" selected="{{geselecteerde}}">
+        <template is="dom-repeat" items= "{{gerechten}}" as="item">
+          <template is="dom-if" if={{!item.opMenukaart}}>
+            <paper-item>{{item.naam}}</paper-item>
+          </template>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+
+    <br>
+
+    <div id=buttons>
+      <paper-button on-click="verwijderFunctie">Verwijder</paper-button>
+
+      <paper-button on-click="annuleerFunctie">Annuleer</paper-button>
+    </div>
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <!-- <span class="close">&times;</span> -->
+        <p id = "titel"> Bevestiging </p>
+        <hr color="black" size="3">
+
+          <div class = "inhoud">
+            <p>Weet je zeker dat je dit gerecht wilt verwijderen? </p>
+            <paper-button raised on-click="neeFunctie">Nee</paper-button>
+            <paper-button raised on-click="verwijderGerecht">Ja</paper-button>
+
+          </div>
+
+      </div>
+
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class GerechtVerwijderen extends Polymer.Element {
+      static get is() { return 'gerecht-verwijderen'; }
+      static get properties() {
+        return{
+          gerechten: Array,
+          geselecteerde: Object,
+          selectedGerecht: Object
+        };
+      }
+
+      annuleerFunctie(){
+      console.log("button geklikt");
+      window.location.href = 'home.html';
+      }
+
+      verwijderFunctie(){
+      console.log("verwijderbutton geklikt");
+      this.$.myModal.style.display = "block";
+
+      }
+
+      neeFunctie(){
+        this.$.myModal.style.display = "none";
+      }
+
+      // verwijderGerecht(){
+      //   this.$.myModal.style.display = "none";
+      //   var test = this.$.dropdownBox.selected;
+      //   var gerechten = this.gerechten;
+      //   console.log(gerechten);
+      //   var gerechtverwijderd = gerechten.splice(test, 1);
+      //   console.log(gerechten);
+      //   console.log(gerechtverwijderd);
+      //   console.log("Button verwijderen");
+      //
+      // }
+
+      verwijderGerecht(){
+        this.$.myModal.style.display = "none";
+        var selectedGerecht = this.$.dropdownBox.selectedItem;
+        if (this.gerechten == null){     //anders is ingredienten undefined en kan ik geen objecten toevoegen
+          this.gerechten = [];
+          alert("gerechten is null");
+  }
+
+  console.log("geselecteerd" + this.geselecteerde);
+  console.log("innertext" + this.$.dropdownBox.innerText );
+
+  if(this.geselecteerde != undefined){
+  console.log("in statement");
+  var opslag = this.$.opslag;
+  var gerechten = this.gerechten;
+  var geselecteerdGerecht = this.geselecteerde;
+
+  var naamGerecht;
+  var gerechtverwijderd;
+
+  var index;
+      for (index = 0; index < this.gerechten.length; ++index) {      //Check of er al een ingredient is met deze naam
+          var object = this.gerechten[index];
+
+       if (object.naam == selectedGerecht.innerText){
+         gerechtverwijderd = this.gerechten.splice(index, 1);
+           naamGerecht = gerechtverwijderd[0]["naam"];
+         }
+         console.log("object is " +object.naam);
+       }
+
+  console.log(gerechten);
+  // var gerechtverwijderd = gerechten.splice(geselecteerdGerecht, 1);    //returnt een list met de verwijderde items
+  // var naamGerecht =  gerechtverwijderd[0]["naam"];
+  opslag.saveValue({"gerechten":this.gerechten});
+  window.location.href = "home.html";
+}
+ }
+
+
+    }
+
+
+
+
+    window.customElements.define(GerechtVerwijderen.is, GerechtVerwijderen);
+  </script>
+</dom-module>

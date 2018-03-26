@@ -1,0 +1,334 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components\app-storage\app-localstorage\app-localstorage-document.html">
+
+<dom-module id="gerecht-toevoegen">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      div.links{
+        float: left;
+        width: 500px;
+      }
+
+      div.rechts{
+        display: inline-block;
+        width: 100px;
+      }
+
+      div.rechts2{
+        display: inline-block;
+        width: 100px;
+      }
+
+      paper-input.links{
+        width: 400px;
+      }
+
+      paper-input.rechts{
+        width: 82px;
+      }
+
+      paper-dropdown-menu.links{
+        width: 400px;
+      }
+
+      div.rechts paper-button{
+        width: 200px;
+        text-align: center;
+      }
+
+      paper-button{
+        border-style: solid;
+      }
+
+      vaadin-grid{
+        width: 540px;
+        float: left;
+        height: 150px;
+      }
+      .modal-content paper-button{
+        width: 25px;
+        height: 25px;
+        float: right;
+      }
+
+      #myModal {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      #myModal2 {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+      #myModal3 {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      #links{
+        margin-left: 10%;
+        margin-top:5%;
+      }
+      #rechts{
+        margin-top:5%;
+      }
+
+      #buttonsonder{
+        margin-left:10%;
+      }
+
+      /* Modal Content/Box */
+      .modal-content{
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          /* padding: 20px; */
+          border: 1px solid #888;
+          width: 25%; /* Could be more or less, depending on screen size */
+          height: 15%;
+      }
+
+      vaadin-grid{
+        margin-left: 10%;
+      }
+
+      .modal-content p{
+        margin-left: 20px;
+      }
+
+      h1{
+        margin-left:5%;
+      }
+
+    </style>
+    <app-localstorage-document id="opslag" key="gerechten" data={{gerechten}}></app-localstorage-document>
+    <app-localstorage-document id="opslag-load" key="ingredienten" data={{ingredienten}}></app-localstorage-document>
+
+    <h1>Gerecht toevoegen</h1>
+    <hr color="black" size="2">
+
+    <div id="links" class="links">
+      <label>Naam gerecht</label>
+      <paper-input class="links" naam="gerecht" value="{{naam}}"></paper-input>
+
+      <label>Ingrediënten<br></label><br>
+      <paper-dropdown-menu class="links" id="ingredientSelectie">
+        <paper-listbox slot="dropdown-content" select="1">
+          <template is="dom-repeat" items="{{ingredienten}}" as="item">
+            <paper-item value="{{ingredient}}">{{item.naam}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+
+
+    </div>
+    <div id ="rechts" class="rechts">
+      <label>Prijs</label>
+      <paper-input class="rechts" type="number" naam="prijs" value="{{prijs}}" text-align="right" min=0></paper-input>
+      <label>Hoeveelheid in gram</label>
+      <paper-input class="rechts" type="number" naam="Hoeveelheid" value="{{aantal}}" min=1></paper-input>
+    </div>
+    <div class="rechts">
+      <paper-button raised on-click="addIngredient">Voeg ingrediënt toe</paper-button>
+    </div>
+    <div>
+      <br>
+      <vaadin-grid items="[[ingredientenNodig]]">
+          <vaadin-grid-column>
+            <template class="header">
+              <vaadin-grid-sorter path="abbreviation">Ingrediënt</vaadin-grid-sorter>
+            </template>
+            <template>[[item.ingredient]]</template>
+          </vaadin-grid-column>
+
+          <vaadin-grid-column>
+            <template class="header">
+              <vaadin-grid-sorter>Aantal gram</vaadin-grid-sorter>
+            </template>
+            <template>[[item.aantal]]</template>
+          </vaadin-grid-column>
+    </div>
+    <br><br>  <br><br>  <br><br>  <br><br>  <br><br>  <br><br>
+    <div id="buttonsonder">
+      <paper-button raised on-click="bevestigingToevoegen">Toevoegen</paper-button>
+      <paper-button raised on-click="annuleerFunctie">Annuleren</paper-button>
+
+    </div>
+
+  <div id="myModal" class="modal">
+      <div class="modal-content">
+        <!-- <span class="close">&times;</span> -->
+        <p id = "titel"> Bevestiging </p>
+        <hr color="black" size="3">
+          <div class = "inhoud">
+            <p>Weet je zeker dat je dit gerecht wilt toevoegen? </p>
+
+            <paper-button raised on-click="neeFunctie">Nee</paper-button>
+            <paper-button raised on-click="addGerecht">Ja</paper-button>
+          </div>
+      </div>
+    </div>
+
+    <div id="myModal2" class="modal">
+        <div class="modal-content">
+          <!-- <span class="close">&times;</span> -->
+          <p id = "titel"> Bevestiging </p>
+          <hr color="black" size="3">
+            <div class = "inhoud">
+              <p>Niet alle velden zijn correct ingevoerd. </p>
+              <paper-button raised on-click="neeFunctie2">Ok</paper-button>
+            </div>
+        </div>
+      </div>
+
+      <div id="myModal3" class="modal">
+          <div class="modal-content">
+            <!-- <span class="close">&times;</span> -->
+            <p id = "titel"> Bevestiging </p>
+            <hr color="black" size="3">
+              <div class = "inhoud">
+                <p>Dit is niet een unieke naam voor een gerecht. </p>
+                <paper-button raised on-click="neeFunctie3">Ok</paper-button>
+              </div>
+          </div>
+        </div>
+
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class GerechtToevoegen extends Polymer.Element {
+      static get is() { return 'gerecht-toevoegen'; }
+      static get properties() {
+        return {
+          test: {
+            type: String
+          },
+          ingredienten: {
+            type: Array
+          },
+          ingredientenNodig: {
+            type: Array,
+            value: [
+
+            ]
+          },
+          gerechten: {
+            type: Array
+          }
+        };
+      }
+      bevestigingToevoegen(){
+        if (this.gerechten == null){     //anders is ingredienten undefined en kan ik geen objecten toevoegen
+          this.gerechten = [];
+        }
+
+        var index;
+        for (index = 0; index < this.gerechten.length; ++index) {      //Check of er al een ingredient is met deze naam
+            var object = this.gerechten[index];
+
+            if (object.naam == this.naam){
+            this.$.myModal3.style.display = "block";
+              return;
+            }
+            console.log(object.naam);
+          }
+        console.log(this.ingredientenNodig);
+        if(this.naam == undefined || this.prijs == undefined || this.ingredientenNodig[0] == null){
+          this.$.myModal2.style.display = "block";
+        }
+        else{
+          this.$.myModal.style.display = "block";
+      }
+      }
+      addIngredient(){
+        var selectedIngredient = this.$.ingredientSelectie.selectedItem;
+
+        if(selectedIngredient == undefined || this.aantal == undefined){
+          this.$.myModal2.style.display = "block";
+        }
+
+        else{
+          this.push('ingredientenNodig',{ingredient : selectedIngredient.innerText, aantal : this.aantal})
+          this.aantal = 0;
+          console.log(this.ingredientenNodig);
+      }
+      }
+      addGerecht(){
+
+        var opslag = this.$.opslag;
+
+        if (this.gerechten == null){     //anders is ingredienten undefined en kan ik geen objecten toevoegen
+          this.gerechten = [];
+          alert("ingredienten is null");
+        }
+
+        this.gerechten.push({naam : this.naam, prijs : this.prijs, ingredienten : this.ingredientenNodig, opMenukaart : false, bestelbaar : false})
+
+        opslag.saveValue({"gerechten":this.gerechten});
+        console.log(this.gerechten);
+        window.location.href = 'home.html'
+
+      }
+      annuleerFunctie(){
+      console.log("button geklikt");
+      window.location.href = 'home.html';
+      }
+
+      neeFunctie(){
+          this.$.myModal.style.display = "none";
+      }
+
+      neeFunctie2(){
+          this.$.myModal2.style.display = "none";
+      }
+
+      neeFunctie3(){
+          this.$.myModal3.style.display = "none";
+      }
+    }
+
+    window.customElements.define(GerechtToevoegen.is, GerechtToevoegen);
+  </script>
+</dom-module>

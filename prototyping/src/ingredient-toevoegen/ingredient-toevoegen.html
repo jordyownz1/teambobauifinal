@@ -1,0 +1,228 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components\vaadin-item\vaadin-item.html">
+<link rel="import" href="../../bower_components\paper-button\paper-button.html">
+<link rel="import" href="../../bower_components\vaadin-list-box\vaadin-list-box.html">
+<link rel="import" href="../../bower_components\app-storage\app-localstorage\app-localstorage-document.html">
+
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components\paper-listbox\paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../../bower_components\paper-input\paper-input.html">
+
+
+<dom-module id="ingredient-toevoegen">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-input{
+        margin-left: 10%;
+        width: 25%;
+      }
+
+      h1{
+        margin-left:5%;
+      }
+
+      h3 {
+        margin-top: 5%;
+
+        margin-left: 10%;
+      }
+
+      #buttons{
+        margin-left:  79%;
+        margin-top: 10%;
+      }
+
+      paper-button{
+        border-style: solid;
+      }
+
+      .modal-content paper-button{
+        width: 25px;
+        height: 25px;
+        float: right;
+      }
+
+      #myModal {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      #myModal2 {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      /* Modal Content/Box */
+      .modal-content{
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          /* padding: 20px; */
+          border: 1px solid #888;
+          width: 25%; /* Could be more or less, depending on screen size */
+          height: 15%;
+      }
+      .modal-content p{
+        margin-left: 20px;
+      }
+
+    </style>
+    <app-localstorage-document id="opslag" key="ingredienten" data={{ingredienten}}></app-localstorage-document>
+
+    <!-- params='{"lat":"[[latitude]]", "lon":"[[longitude]]", "appid":"684d4cb2840ec7fa4340e79722d083f8"}' -->
+    <br>
+    <!-- <vaadin-list-box id="listBox" selected="0">
+      <b>Selecteer een ingredient</b>
+      <template is="dom-repeat" items="{{ingredienten}}" as="item">
+      <vaadin-item>"{{item.naam}}"</vaadin-item>
+      </template>
+    </vaadin-list-box> -->
+
+    <h1>Ingrediënt toevoegen</h1>
+    <hr color="black" size="3">
+
+    <h3>Voeg een ingredient toe:</h3>
+    <paper-input label="Naam" value="{{naam}}"></paper-input>
+    <paper-input label="Gewenste voorraad" value="{{gewensteVoorraad}}" type="number" min=0></paper-input>
+    <paper-input label="Minimum voorraad" value="{{minimumVoorraad}}" type="number" min=0></paper-input>
+
+
+    <div id="buttons">
+    <paper-button on-click="bevestigingToevoegen">Toevoegen</paper-button>
+    <paper-button on-click="annuleerFunctie">Annuleren</paper-button>
+    </div>
+
+    <div id="myModal" class="modal">
+
+      <div class="modal-content">
+        <!-- <span class="close">&times;</span> -->
+        <p id = "titel"> Bevestiging </p>
+        <hr color="black" size="3">
+
+          <div class = "inhoud">
+            <p>Weet je zeker dat je dit ingredient wilt toevoegen? </p>
+            <paper-button raised on-click="neeFunctie">Nee</paper-button>
+            <paper-button raised on-click="voegIngredientToe">Ja</paper-button>
+
+          </div>
+
+      </div>
+
+    </div>
+
+    <div id="myModal2" class="modal">
+        <div class="modal-content">
+          <!-- <span class="close">&times;</span> -->
+          <p id = "titel"> Bevestiging </p>
+          <hr color="black" size="3">
+            <div class = "inhoud">
+              <p>Dit is niet een unieke naam voor een ingrediënt </p>
+              <paper-button raised on-click="neeFunctie2">Ok</paper-button>
+            </div>
+        </div>
+      </div>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class IngredientToevoegen extends Polymer.Element {
+      static get is() { return 'ingredient-toevoegen'; }
+      static get properties() {
+        return {
+          ingredienten: Array,
+          naam: String,
+          gewensteVoorraad: Number,
+          minimumVoorraad: Number,
+          huidigeVoorraad: {type: Number, value: 0},
+          geselecteerde: Object
+  };
+}
+
+
+bevestigingToevoegen(){
+  this.$.myModal.style.display = "block";
+}
+
+voegIngredientToe(){
+  this.$.myModal.style.display = "none";
+
+  if (this.ingredienten == null){     //anders is ingredienten undefined en kan ik geen objecten toevoegen
+    this.ingredienten = [];
+  }
+  var opslag = this.$.opslag;
+  // this.ingredienten = opslag.
+  console.log(this.ingredienten);
+
+  var index;
+  for (index = 0; index < this.ingredienten.length; ++index) {      //Check of er al een ingredient is met deze naam
+      var object = this.ingredienten[index];
+
+      if (object.naam == this.naam){
+        this.$.myModal2.style.display = "block";
+        return;
+      }
+      console.log(object.naam);
+    }
+
+  if (this.naam != null && this.naam != "" && this.gewensteVoorraad != null
+      && this.gewensteVoorraad != "" && this.minimumVoorraad != null && this.minimumVoorraad != ""){
+
+  this.ingredienten.push({naam : this.naam, gewensteVoorraad : parseInt(this.gewensteVoorraad), minimumVoorraad : parseInt(this.minimumVoorraad), huidigeVoorraad : this.huidigeVoorraad});
+  console.log(this.ingredienten);
+  opslag.saveValue({"ingredienten":this.ingredienten});
+  window.location.href = "home.html";
+  }
+  else{
+    alert("Niet alle velden zijn juist ingevuld!");
+  }
+
+
+  // window.location.href = "ingredient_verwijderen.html";
+}
+
+neeFunctie(){
+  this.$.myModal.style.display = "none";
+}
+
+neeFunctie2(){
+    this.$.myModal2.style.display = "none";
+}
+
+annuleerFunctie(){
+  console.log("Button Annuleren");
+  window.location.href = 'home.html';
+}
+
+  }
+
+    window.customElements.define(IngredientToevoegen.is, IngredientToevoegen);
+  </script>
+</dom-module>

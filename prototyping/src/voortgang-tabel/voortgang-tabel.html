@@ -1,0 +1,196 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components\vaadin-grid\vaadin-grid.html">
+<link rel="import" href="../../bower_components\vaadin-grid\vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components\vaadin-grid\vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components\paper-button\paper-button.html">
+
+
+
+
+<dom-module id="voortgang-tabel">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-button{
+        width: 250px;
+        height: 50px;
+        margin-left: 25px;
+        border: 1px solid;
+      }
+
+      vaadin-grid{
+        border: 1px solid;
+        empty-cells: show;
+        border: 1px solid;
+        margin-left: 25px;
+        padding: 8px;
+        background-color: lightgreen;
+        width: 31%;
+        height: 575px;
+      }
+
+      .modal-content paper-button{
+        width: 25px;
+        height: 25px;
+        float: right;
+      }
+
+      #myModal {
+          /* display: none; /* Hidden by default */
+          display: none;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      /* Modal Content/Box */
+      .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto; /* 15% from the top and centered */
+          padding: 20px;
+          border: 1px solid #888;
+          width: 25%; /* Could be more or less, depending on screen size */
+      }
+
+      /* The Close Button */
+      /* .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+      } */
+    </style>
+
+    <vaadin-grid items="[[vakken]]" size="100" column-reordering-allowed multi-sort size>
+
+        <vaadin-grid-column width="200px" flex-grow="0">
+          <template class="header" flex-grow="0">
+              <vaadin-grid-sorter>Vakcode</vaadin-grid-sorter>
+          </template>
+          <template>[[item.vakcode]]</template>
+        </vaadin-grid-column>
+
+        <vaadin-grid-column  width="125px" flex-grow="0">
+            <template class="header">
+              <vaadin-grid-sorter>ECTS</vaadin-grid-sorter>
+            </template>
+            <template><paper-input value={{item.ects}}></paper-input></template>
+        </vaadin-grid-column>
+
+        <vaadin-grid-column  width="253px" flex-grow="0">
+            <template class="header">
+              <vaadin-grid-sorter>Datum behaald</vaadin-grid-sorter>
+            </template>
+            <template><input type="date"></input></template>
+        </vaadin-grid-column>
+
+    </vaadin-grid>
+
+
+
+    <br>
+
+    <paper-button raised on-click="berekenStudieTempo">Bereken Studietempo</paper-button>
+    <!-- <button id="myBtn">Bereken Studietempo</button> -->
+    <!-- </div> -->
+
+
+    <div id="myModal" class="modal" hidden="{{hideDialoog}}">
+      Modal content
+      <div class="modal-content">
+        <paper-button raised on-click="hidePopup">X</paper-button>
+        <!-- <span class="close">&times;</span> -->
+        <p id = "inhoud">Je hebt tot nu toe 25 ECTS behaald.<br><br>
+           Je huidige studietempo is:<br>
+           4ECTS / mnd.<br><br>
+           Op basis van dit studietempo heb je 15 mnd nodig voor je P.</p>
+      </div>
+
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class VoortgangTabel extends Polymer.Element {
+      static get is() { return 'voortgang-tabel'; }
+      static get properties() {
+        return {
+          vakken: {
+            type: Array,
+            value: [
+              {vakcode : "TICT-V1GP-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1PROG-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1CSN-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1ICOR-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1MOD-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1PROF-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1AUI-15", ects : 0, datum : ""},
+              {vakcode : "TICT-V1OODC-15", ects : 0, datum : ""}
+            ]
+          },
+          // voornaam_tabel: {type: String, value: "Remco"},
+          // achternaam_tabel: {type: String, value: "Taal"}
+      };
+  }
+
+berekenStudieTempo(){
+console.log("button geklikt");
+// var modal = document.getElementById('myModal');
+// modal.style.display = "block"
+var lijst_inputvelden = this.vakken;
+
+var aantal_ects = 0;
+
+lijst_inputvelden.forEach(function(item){
+  aantal_ects += parseInt(item["ects"]);
+  console.log(aantal_ects);
+});
+
+var start_datum = new Date("9/1/2017").getTime(); //opleiding begonnen op
+var datum_nu = new Date().getTime();
+var verschil_milliseconden = datum_nu - start_datum;
+var aantal_maanden = verschil_milliseconden / 2629746000; //aantal milliseconden per maand
+var ects_perMaand = parseFloat((aantal_ects / aantal_maanden).toFixed(2));
+var maanden_voorP = parseFloat((60 / ects_perMaand).toFixed(2));
+
+this.$.inhoud.innerHTML =
+"Je hebt tot nu toe " + aantal_ects + " ECTS behaald.<br><br>" +
+"Je huidige studietempo is: <br>" + ects_perMaand + " ECTS / mnd.<br><br>" +
+"Op basis van dit studietempo heb je " + maanden_voorP + " mnd nodig voor je P.";
+
+
+
+this.$.myModal.style.display = "block";
+
+}
+
+hidePopup(){
+console.log("button2 geklikt");
+this.$.myModal.style.display = "none";
+
+}
+}
+    window.customElements.define(VoortgangTabel.is, VoortgangTabel);
+  </script>
+</dom-module>
